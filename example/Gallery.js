@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { states } from './galleryState'
+import {connect} from 'react-redux'
+import {states} from './galleryState'
 
 class Gallery extends React.Component {
   render() {
-    const { currentState, openPhoto } = this.props
+    const {currentState, openPhoto} = this.props
     return (
       <section className="ui-items" data-state={currentState}>
         {currentState === states.ERROR ? (
@@ -14,7 +14,7 @@ class Gallery extends React.Component {
             <img
               src={item.media.m}
               className="ui-item"
-              style={{ '--i': i }}
+              style={{'--i': i}}
               key={item.link}
               onClick={() => openPhoto(item)}
             />
@@ -25,7 +25,7 @@ class Gallery extends React.Component {
   }
 }
 
-export default connect(({ gallery }) => ({
+export default connect(({gallery}) => ({
   items: gallery.items,
   error: gallery.error
 }))(Gallery)

@@ -17,14 +17,14 @@ export const machinesReducer = (state = {}, action) => {
         ? state[action.machineName].current
         : undefined
     }
-    return { ...state, [action.machineName]: updatedMachine }
+    return {...state, [action.machineName]: updatedMachine}
   }
   return state
 }
 
 /*~*~*~*~*~*~*~*~*~*~*~* CREATE MIDDLEWARE *~*~*~*~*~*~*~*~*~*~*~*/
 export function createMachineMiddleware(machines, options = {}) {
-  return ({ dispatch, getState }) => next => action => {
+  return ({dispatch, getState}) => next => action => {
     const validate = !!options.strict
     const currentStoreState = getState()
     if (!currentStoreState.machines && validate) {
@@ -45,11 +45,11 @@ export function createMachineMiddleware(machines, options = {}) {
       for (const [_, currentMachine] of allMachines) {
         const nextState = findState(currentMachine, action.stateName)
         if (has('before', nextState)) {
-          dispatch(nextState.before({ dispatch, getState, action }))
+          dispatch(nextState.before({dispatch, getState, action}))
         }
         nextAction = next(action)
         if (has('after', nextState)) {
-          dispatch(nextState.after({ dispatch, getState, action }))
+          dispatch(nextState.after({dispatch, getState, action}))
         }
       }
     } else {
@@ -86,11 +86,11 @@ export function createMachineMiddleware(machines, options = {}) {
                 transition.to
               )
               if (has('before', transition)) {
-                dispatch(transition.before({ getState, dispatch, action }))
+                dispatch(transition.before({getState, dispatch, action}))
               }
               dispatch(transitionTo(machineName, nextState))
               if (has('after', transition)) {
-                dispatch(transition.after({ getState, dispatch, action }))
+                dispatch(transition.after({getState, dispatch, action}))
               }
               break
             }

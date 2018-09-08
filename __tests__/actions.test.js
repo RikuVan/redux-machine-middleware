@@ -1,4 +1,4 @@
-import { TRANSITION_MACHINE, transitionTo } from '../source/'
+import {TRANSITION_MACHINE, transitionTo} from '../source/'
 
 test('transitionTo', () => {
   const action = transitionTo('foo', 'STATE_1')

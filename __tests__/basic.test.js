@@ -1,4 +1,4 @@
-import { createMachineMiddleware as middleware } from '../source'
+import {createMachineMiddleware as middleware} from '../source'
 
 const doDispatch = v => v
 const doGetState = () => ({
@@ -30,7 +30,7 @@ it('should pass the intercepted action to next', () => {
   const doNext = (...args) => {
     return nextArgs.push(args)
   }
-  const action = { type: 'INC' }
+  const action = {type: 'INC'}
   const result = nextHandler(doNext)(action)
   console.log('here', result)
   expect(nextArgs[0]).toEqual([action])

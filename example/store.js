@@ -1,16 +1,16 @@
-import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
+import {createStore, applyMiddleware, combineReducers, compose} from 'redux'
 import createSagaMiddleware from 'redux-saga'
-import { all, fork } from 'redux-saga/effects'
+import {all, fork} from 'redux-saga/effects'
 
-import { gallerySaga, galleryReducer, galleryMachine } from './galleryState'
+import {gallerySaga, galleryReducer, galleryMachine} from './galleryState'
 import createMachineMiddleware, {
   machinesReducer,
   transitionTo
 } from './middleware'
 
 const machineMiddleware = createMachineMiddleware(
-  { gallery: galleryMachine },
-  { strict: true }
+  {gallery: galleryMachine},
+  {strict: true}
 )
 
 function* rootSaga() {

@@ -1,0 +1,17 @@
+{
+  "bracketSpacing": false,
+  "printWidth": 80,
+  "proseWrap": "never",
+  "requirePragma": false,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "printWidth": 200
+      }
+    }
+  ]
+}

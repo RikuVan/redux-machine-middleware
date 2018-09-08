@@ -1,5 +1,5 @@
-import { all, takeLatest, call, put } from 'redux-saga/effects'
-import { delay } from 'redux-saga'
+import {all, takeLatest, call, put} from 'redux-saga/effects'
+import {delay} from 'redux-saga'
 import fetchJsonp from 'fetch-jsonp'
 
 const UPDATE_QUERY = 'UPDATE_QUERY'
@@ -8,8 +8,8 @@ const COMPLETE_SEARCH = 'COMPLETE_SEARCH'
 const UPDATE_GALLERY = 'UPDATE_GALLERY'
 const OPEN_PHOTO = 'OPEN_PHOTO'
 
-export const updateQuery = query => ({ type: UPDATE_QUERY, query })
-export const submitSearch = query => ({ type: SEARCH, query })
+export const updateQuery = query => ({type: UPDATE_QUERY, query})
+export const submitSearch = query => ({type: SEARCH, query})
 export const completeSearch = (items, error) => ({
   type: COMPLETE_SEARCH,
   items,
@@ -20,7 +20,7 @@ export const updateGallery = (items, error) => ({
   items,
   error
 })
-export const openPhoto = item => ({ type: OPEN_PHOTO, item })
+export const openPhoto = item => ({type: OPEN_PHOTO, item})
 
 export const states = {
   NOT_ASKED: 'not-asked',
@@ -42,18 +42,18 @@ export const galleryMachine = {
       name: states.START,
       autoTransitions: [
         {
-          cond: (_, { type }) => type === SEARCH,
+          cond: (_, {type}) => type === SEARCH,
           to: states.LOADING
         }
       ],
-      after: ({ getState }) => submitSearch(getState().gallery.query),
+      after: ({getState}) => submitSearch(getState().gallery.query),
       validTransitions: [states.LOADING]
     },
     {
       name: states.LOADING,
       autoTransitions: [
         {
-          after: ({ action }) => updateGallery(action.items),
+          after: ({action}) => updateGallery(action.items),
           cond: (_, action) => action.type === COMPLETE_SEARCH && action.items,
           to: states.GALLERY
         },
@@ -88,9 +88,9 @@ function* fetchImages(action) {
       `https://api.flickr.com/services/feeds/photos_public.gne?lang=en-us&format=json&tags=${encodeURIComponent(
         action.query
       )}`,
-      { jsonpCallback: 'jsoncallback' }
+      {jsonpCallback: 'jsoncallback'}
     )
-    const { items } = yield response.json()
+    const {items} = yield response.json()
     yield put(completeSearch(items, null))
   } catch (error) {
     yield put(completeSearch(null, error))
@@ -101,16 +101,16 @@ export function* gallerySaga() {
   yield all([takeLatest('SEARCH', fetchImages)])
 }
 
-export const galleryReducer = (state = { items: [], query: '' }, action) => {
+export const galleryReducer = (state = {items: [], query: ''}, action) => {
   switch (action.type) {
     case UPDATE_QUERY: {
-      return { ...state, query: action.query }
+      return {...state, query: action.query}
     }
     case UPDATE_GALLERY: {
-      return { ...state, items: action.items, error: action.error }
+      return {...state, items: action.items, error: action.error}
     }
     case OPEN_PHOTO: {
-      return { ...state, photo: action.item }
+      return {...state, photo: action.item}
     }
   }
   return state

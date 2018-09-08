@@ -1,7 +1,7 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 import {
   updateQuery,
   submitSearch,
@@ -10,9 +10,9 @@ import {
   closePhoto
 } from './galleryState'
 import './index.scss'
-import { store } from './store'
+import {store} from './store'
 import Gallery from './Gallery'
-import { transitionTo } from './middleware'
+import {transitionTo} from './middleware'
 
 /*
   This example was adopting from an xstate example by David Khourshid: https://codepen.io/davidkpiano/pen/dJJMWE
@@ -21,14 +21,8 @@ import { transitionTo } from './middleware'
 const transitionGallery = stateName => transitionTo('gallery', stateName)
 
 class App extends React.Component {
-  submit(e) {
-    e.persist()
-    e.preventDefault()
-    this.props.submitSearch(e)
-  }
-
   render() {
-    const { currentState, transitionGallery, openPhoto, photo } = this.props
+    const {currentState, transitionGallery, openPhoto, photo} = this.props
     const searchText =
       {
         [states.LOADING]: 'Searching...',
@@ -82,12 +76,12 @@ class App extends React.Component {
 }
 
 const ConnectedApp = connect(
-  ({ gallery, machines }) => ({
+  ({gallery, machines}) => ({
     query: gallery.query,
     currentState: machines.gallery.current,
     photo: gallery.photo
   }),
-  { updateQuery, submitSearch, transitionGallery, openPhoto, closePhoto }
+  {updateQuery, submitSearch, transitionGallery, openPhoto, closePhoto}
 )(App)
 
 ReactDOM.render(
