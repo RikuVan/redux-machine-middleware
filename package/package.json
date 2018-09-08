@@ -1,0 +1,51 @@
+{
+  "name": "redux-machine-middleware",
+  "version": "0.1.2",
+  "description": "A state machine a redux middleware",
+  "main": "index.js",
+  "scripts": {
+    "watch": "jest --watch",
+    "test": "jest",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "build": "rimraf dist/ && cross-env NODE_ENV=production rollup -c && cpx \"source/index.js\" dist",
+    "prepublish": "yarn-or-npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RikuVan/redux-machine-middleware.git"
+  },
+  "author": "Richard Van Camp",
+  "license": "ISC",
+  "keywords": [
+    "redux",
+    "middleware",
+    "finite-state-machine"
+  ],
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-external-helpers": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-core": "^7.0.0-0",
+    "babel-jest": "^23.4.2",
+    "coveralls": "^3.0.2",
+    "cpx": "^1.5.0",
+    "cross-env": "^5.2.0",
+    "jest": "^23.5.0",
+    "ramda": "^0.25.0",
+    "redux-mock-store": "^1.5.3",
+    "regenerator-runtime": "^0.12.1",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "^4.0.2",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-filesize": "^4.0.1",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-uglify": "^5.0.2",
+    "uglify-es": "^3.3.9"
+  },
+  "dependencies": {
+    "yarn-or-npm": "^2.0.4"
+  }
+}
