@@ -68,18 +68,22 @@ export function createMachineMiddleware(machines, options = {}) {
             currentStoreState
           )
           for (const transition of currentState.autoTransitions) {
+            validate && validateTransitionObj(transition)
             const shouldTransition = getShouldTransition(
               transition.cond,
               storeState,
               action
             )
-            if (typeof shouldTransition === 'undefined' && validate) {
+            if (
+              typeof shouldTransition === 'undefined' &&
+              transition.cond &&
+              validate
+            ) {
               throw new Error(
                 'Ensure your cond function returns a truthy or falsey value'
               )
             }
             if (shouldTransition) {
-              validate && validateTransitionObj(transition)
               const nextState = getNextStateName(
                 currentMachine.states,
                 currentState.name,
@@ -153,18 +157,24 @@ function validateTransitionObj(transition) {
         return
       }
       case 'to': {
+        // custom properties can be added with a underscore or dollar sign prefix
         if (!is(transition[key], 'String')) {
           throwTypeError(transition[key], 'string')
         }
         return
       }
       default: {
-        throw new Error(
-          `${key} is not a valid property for transition configuration`
+        if (hasPrefix(key)) return
+        throw new TypeError(
+          `${key} is not a valid property for autoTransition configuration`
         )
       }
     }
   })
+}
+
+function hasPrefix(val) {
+  return /^[$_]/i.test(val)
 }
 
 function throwTypeError(val, type) {

@@ -1,6 +1,6 @@
 # `REDUX MACHINE MIDDLEWARE`
 
-[![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg?branch=master)](https://coveralls.io/github/RikuVan/redux-machine-middleware?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg)](https://coveralls.io/github/RikuVan/redux-machine-middleware)
 
 ### Beware, this is new and not tested in apps
 
@@ -77,7 +77,7 @@ In strict mode, errors will be thrown for:
 
 - missing machine
 - `transitionTo` called with invalid next state
-- invalid transition object properties
+- invalid transition object properties (prefix special properties with underscore or dollar sign and they will be ignored)
 - invalid transition object value types
 - cond function which does not return a truthy or falsey value
 

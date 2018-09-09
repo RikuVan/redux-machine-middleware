@@ -126,20 +126,6 @@ test('invalid stateName in transitionTo should throw an error in strict mode', (
   )
 })
 
-test('invalid property should throw an error in strict mode', () => {
-  const m = R.set(
-    R.lensPath(['foo', 'states', 0, 'autoTransitions', 0, 'condition']),
-    v => v,
-    initialMachines
-  )
-  const {actionHandler} = setUpForTest(m)
-  expect(() =>
-    actionHandler(actionHandler({type: 'BAZ_ACTION'})).toThrow(
-      /'condition' is not a valid property for transition configuration/
-    )
-  )
-})
-
 test('cond will use whole store state if storePath not provided', () => {
   const m = R.compose(
     R.over(R.lensPath(['foo']), R.omit(['selector'])),
@@ -175,4 +161,42 @@ test('before and after actions will be dispatched if the exist on transition', (
   actionHandler({type: 'BAZ_ACTION'})
   expect(doDispatch).toHaveBeenNthCalledWith(1, {type: 'BEFORE'})
   expect(doDispatch).toHaveBeenNthCalledWith(3, {type: 'AFTER'})
+})
+
+test('throws an error if transition contains an invalid property in strict mode', () => {
+  const m = R.set(
+    R.lensPath(['foo', 'states', 2, 'autoTransitions', 0]),
+    {
+      condition: baz => baz > 2 && baz < 4,
+      to: 'STATE_0'
+    },
+    initialMachines
+  )
+  const {actionHandler} = setUpForTest(m, {
+    baz: -1,
+    machines: {foo: {}}
+  })
+  expect(() => actionHandler({type: 'BAZ_ACTION', payload: 'hey'})).toThrow(
+    `condition is not a valid property for autoTransition configuration`
+  )
+})
+
+test('transition object may contain special property prefixed with _ or $ in strict mode', () => {
+  const m = R.set(
+    R.lensPath(['foo', 'states', 2, 'autoTransitions', 0]),
+    {
+      cond: baz => baz === 1000,
+      _special: [0, 1],
+      $data: 'extra',
+      to: 'STATE_0'
+    },
+    initialMachines
+  )
+  const {actionHandler} = setUpForTest(m, {
+    baz: -1,
+    machines: {foo: {}}
+  })
+  expect(() =>
+    actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
+  ).not.toThrow()
 })
