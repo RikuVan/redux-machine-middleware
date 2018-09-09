@@ -1,4 +1,4 @@
-# `REDUX MACHINE MIDDLEWARE`
+# `redux-machine-middleware`
 
 [![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg?branch=master)](https://coveralls.io/github/RikuVan/redux-machine-middleware?branch=master)
 
@@ -119,7 +119,7 @@ const machines = {
             to: 'RUNNING'
           }
         ],
-        // if 'IDLE' transitions via a transtionTo action, this hook will be called
+        // if 'IDLE' is the next state called with transtionTo, 'before' or 'after' hooks will be called
         after: ({getState, dispatch, action}) => announceShutdown(action)
       },
       validTransitions: ['RUNNING']
