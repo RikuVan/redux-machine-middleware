@@ -1,8 +1,11 @@
 {
   "name": "redux-machine-middleware",
-  "version": "0.1.1",
-  "description": "A state machine a redux middleware",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "A simple state machine as redux middleware",
+    "main": "dist/redux-machine-middleware.js",
+    "umd:main": "dist/redux-machine-middleware.umd.js",
+    "module": "dist/redux-machine-middleware.module.js",
+    "jsnext:main": "dist/redux-machine-middleware.module.js",
   "scripts": {
     "watch": "jest --watch",
     "test": "jest",

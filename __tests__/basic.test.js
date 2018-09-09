@@ -32,6 +32,5 @@ it('should pass the intercepted action to next', () => {
   }
   const action = {type: 'INC'}
   const result = nextHandler(doNext)(action)
-  console.log('here', result)
   expect(nextArgs[0]).toEqual([action])
 })

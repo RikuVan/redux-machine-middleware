@@ -41,6 +41,10 @@ const rootReducer = combineReducers({
 store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 ```
 
+### Why
+
+There are much better explanations of finite state machines out there than what I can provide and a state machine is probably overkill for small functionality. But here is why I am interested. As features grow, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. But we still lack the ability to hook into the transitions from state to state--the variants grow out of control. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of forcing your to document states.
+
 ### API
 
 ### Middleware
@@ -73,8 +77,9 @@ In strict mode, errors will be thrown for:
 
 ```js
 const machines = {
-  fooMachine: {
-    current: 'IDLE',
+  foo: {
+    // it is recommend your initialize the machine reducer with this value when loading the component/app
+    default: 'IDLE',
     // option to pass only a slice of redux store to cond functions
     selector: ['foo'],
     states: [
@@ -83,13 +88,12 @@ const machines = {
         autoTransitions: [
           {
             // cond takes state and the current action and returns a boolean
-            // if cond passes, to value for the this transition will be dispatched with transitionTo
-            cond: (foo, action) => {
-              action.payload + foo.number > 10
-            }
+            // if cond passes, the `to` value (next state) for the this transition will be dispatched with transitionTo
+            cond: (foo, action) => action.payload + foo.number > 10
             to: 'IDLE'
             // if this state is dispatching the following actions will be dispatched before and after
-            // ONLY for this particular autoTransition
+            // ONLY for this particular autoTransition if nested in the autoTransition
+            // in this case hooks outside of the autoTransition will not be called
             before: ({getState, dispatch, action}) => launchMissle(),
             after: ({getState, dispatch, action}) => cleanUpTheMess()
           }
@@ -105,9 +109,10 @@ const machines = {
             to: 'RUNNING'
           }
         ],
-        // if IDLE transitions with transtionTo, this hook will be called
+        // if 'IDLE' transitions via a transtionTo action, this hook will be called
         after: ({getState, dispatch, action}) => announceShutdown(action)
-      }
+      },
+      validTransitions: ['RUNNING']
     ]
   }
 }
