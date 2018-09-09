@@ -14,6 +14,10 @@
 ### Quick start
 
 ```js
+npm install redux-machine-middleware
+```
+
+```js
 import {
   createMachineMiddleware
   machinesReducer,
@@ -44,6 +48,10 @@ store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 ### Why
 
 There are much better explanations of finite state machines out there than what I can provide and a state machine is probably overkill for small functionality. But here is why I am interested. As features grow, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. But we still lack the ability to hook into the transitions from state to state--the variants grow out of control. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of forcing your to document states.
+
+### Examples
+
+I have ported David Khourshid's example app for xstate (an excellent full-featured finite state machine lib). The code is under `/example`. Here is the [live version](http://redux-machine-middleware-ex.surge.sh/) and [the original](https://codepen.io/davidkpiano/pen/dJJMWE). I plan to do a questionnaire with tabs of new questions dependent on your last answers.
 
 ### API
 
