@@ -1,15 +1,17 @@
 # `REDUX MACHINE MIDDLEWARE`
 
-[![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg)](https://coveralls.io/github/RikuVan/redux-machine-middleware)
+[![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg?branch=master)](https://coveralls.io/github/RikuVan/redux-machine-middleware?branch=master)
 
-### Beware, this is new and not tested in apps
+### Beware, this is new and untested in the wild.
 
 ## TODO
 
-- [ ] eslint
+- [x] eslint
 - [ ] > 90% test coverage
 - [ ] add additional complex example
 - [x] build (rollup?)
+- [ ] option to use your own reducer
+- [ ] possibility to initialize more machines via action
 
 ### Quick start
 

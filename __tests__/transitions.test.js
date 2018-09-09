@@ -35,6 +35,8 @@ const initialMachines = {
             to: 'STATE_2'
           }
         ],
+        before: () => ({type: 'BEFORE'}),
+        after: () => ({type: 'AFTER'}),
         validTransitions: ['STATE_2']
       },
       {
@@ -46,8 +48,8 @@ const initialMachines = {
           },
           {
             cond: baz => baz === 100,
-            after: () => ({type: 'AFTER'}),
             before: () => ({type: 'BEFORE'}),
+            after: () => ({type: 'AFTER'}),
             to: 'STATE_O'
           }
         ],
@@ -67,12 +69,14 @@ const setUpForTest = (machines, initialState) => {
   const doDispatch = jest.fn(store.dispatch)
   const doGetState = jest.fn(store.getState)
   const doNext = jest.fn()
-  const nextHandler = middleware(machines || initialMachines, {strict: true})({
+  const nextHandler = middleware(machines || initialMachines, {
+    strict: true
+  })({
     dispatch: doDispatch,
     getState: doGetState
   })
   const actionHandler = nextHandler(doNext)
-  return {store, doDispatch, nextHandler, actionHandler}
+  return {store, doDispatch, doGetState, doNext, nextHandler, actionHandler}
 }
 
 test('should transition based on store state passed to cond', () => {
@@ -153,7 +157,17 @@ test('throws error if machine is missing in strict mode', () => {
   )
 })
 
-test('before and after actions will be dispatched if the exist on transition', () => {
+test('actions still ok without machine when not in strict mode', () => {
+  const {doDispatch, doGetState, doNext} = setUpForTest()
+  const nextHandler = middleware(undefined)({
+    dispatch: doDispatch,
+    getState: doGetState
+  })
+  const actionHandler = nextHandler(doNext)
+  expect(() => actionHandler({type: 'BAZ'})).not.toThrow()
+})
+
+test('before and after actions will be dispatched if they exist on transition', () => {
   const {actionHandler, doDispatch} = setUpForTest(initialMachines, {
     baz: 100,
     machines: {}
@@ -161,6 +175,16 @@ test('before and after actions will be dispatched if the exist on transition', (
   actionHandler({type: 'BAZ_ACTION'})
   expect(doDispatch).toHaveBeenNthCalledWith(1, {type: 'BEFORE'})
   expect(doDispatch).toHaveBeenNthCalledWith(3, {type: 'AFTER'})
+})
+
+test('before and after actions will be dispatched if they exist on a state', () => {
+  const {actionHandler, doDispatch} = setUpForTest(initialMachines, {
+    baz: 10,
+    machines: {foo: {current: 'STATE_0'}}
+  })
+  actionHandler(transitionTo('foo', 'STATE_1'))
+  expect(doDispatch).toHaveBeenNthCalledWith(1, {type: 'BEFORE'})
+  expect(doDispatch).toHaveBeenNthCalledWith(2, {type: 'AFTER'})
 })
 
 test('throws an error if transition contains an invalid property in strict mode', () => {

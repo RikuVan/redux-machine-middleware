@@ -23,7 +23,7 @@ export const machinesReducer = (state = {}, action) => {
 }
 
 /*~*~*~*~*~*~*~*~*~*~*~* CREATE MIDDLEWARE *~*~*~*~*~*~*~*~*~*~*~*/
-export function createMachineMiddleware(machines, options = {}) {
+export function createMachineMiddleware(machines = {}, options = {}) {
   return ({dispatch, getState}) => next => action => {
     const validate = !!options.strict
     const currentStoreState = getState()
@@ -32,7 +32,6 @@ export function createMachineMiddleware(machines, options = {}) {
         'missing initial machine state: add the machineReducer to combineReducer'
       )
     }
-    const allMachines = Object.entries(machines)
     let nextAction
     if (has('type', action) && action.type === TRANSITION_MACHINE) {
       validate &&
@@ -42,7 +41,7 @@ export function createMachineMiddleware(machines, options = {}) {
           action,
           currentStoreState.machines[action.machineName]
         )
-      for (const [_, currentMachine] of allMachines) {
+      for (const currentMachine of Object.values(machines)) {
         const nextState = findState(currentMachine, action.stateName)
         if (has('before', nextState)) {
           dispatch(nextState.before({dispatch, getState, action}))
@@ -53,7 +52,7 @@ export function createMachineMiddleware(machines, options = {}) {
         }
       }
     } else {
-      for (const [machineName, currentMachine] of allMachines) {
+      for (const [machineName, currentMachine] of Object.entries(machines)) {
         const currentState = findStateWithDefault(
           currentMachine,
           currentStoreState.machines[machineName]
@@ -90,11 +89,23 @@ export function createMachineMiddleware(machines, options = {}) {
                 transition.to
               )
               if (has('before', transition)) {
-                dispatch(transition.before({getState, dispatch, action}))
+                dispatch(
+                  transition.before({
+                    getState,
+                    dispatch,
+                    action
+                  })
+                )
               }
               dispatch(transitionTo(machineName, nextState))
               if (has('after', transition)) {
-                dispatch(transition.after({getState, dispatch, action}))
+                dispatch(
+                  transition.after({
+                    getState,
+                    dispatch,
+                    action
+                  })
+                )
               }
               break
             }
