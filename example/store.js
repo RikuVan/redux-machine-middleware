@@ -3,10 +3,11 @@ import createSagaMiddleware from 'redux-saga'
 import {all, fork} from 'redux-saga/effects'
 
 import {gallerySaga, galleryReducer, galleryMachine} from './galleryState'
-import createMachineMiddleware, {
+import {
+  createMachineMiddleware,
   machinesReducer,
   transitionTo
-} from './middleware'
+} from 'redux-machine-middleware'
 
 const machineMiddleware = createMachineMiddleware(
   {gallery: galleryMachine},

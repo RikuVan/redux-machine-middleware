@@ -1984,6 +1984,10 @@ fbjs@^0.8.16:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
+fetch-jsonp@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/fetch-jsonp/-/fetch-jsonp-1.1.3.tgz#9eb9e585ba08aaf700563538d17bbebbcd5a3db2"
+
 filesize@^3.6.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.6.1.tgz#090bb3ee01b6f801a8a8be99d31710b3422bb317"
@@ -4177,9 +4181,9 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-machine-middleware@^0.1.0:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.1.1.tgz#bebf2cb825912784c40d5dc0b78a6fd0adcae8a7"
+redux-machine-middleware@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.1.3.tgz#ea651f50e2b1bdca4ddbdf0bbee3a0e2dc400be1"
 
 redux-saga@^0.16.0:
   version "0.16.0"

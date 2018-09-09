@@ -1,6 +1,6 @@
 {
   "name": "redux-machine-middleware",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "A simple state machine as redux middleware",
     "main": "dist/redux-machine-middleware.js",
     "umd:main": "dist/redux-machine-middleware.umd.js",

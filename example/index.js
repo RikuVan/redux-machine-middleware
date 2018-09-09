@@ -12,7 +12,7 @@ import {
 import './index.scss'
 import {store} from './store'
 import Gallery from './Gallery'
-import {transitionTo} from './middleware'
+import {transitionTo} from 'redux-machine-middleware'
 
 /*
   This example was adopting from an xstate example by David Khourshid: https://codepen.io/davidkpiano/pen/dJJMWE
