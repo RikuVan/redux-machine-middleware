@@ -10,19 +10,19 @@ const nextHandler = middleware({})({
 })
 
 test('must return a function to handle next', () => {
-  expect(nextHandler).isFunction
+  expect(typeof nextHandler).toBe('function')
   expect(nextHandler.length).toBe(1)
 })
 
 test('return a function to handle action', () => {
   const actionHandler = nextHandler()
-  expect(actionHandler).isFunction
+  expect(typeof actionHandler).toBe('function')
   expect(actionHandler.length).toBe(1)
 })
 
 test('return a function to handle action', () => {
   const actionHandler = nextHandler()
-  expect(actionHandler).not.isFunction
+  expect(typeof actionHandler).toBe('function')
 })
 
 it('should pass the intercepted action to next', () => {

@@ -1,6 +1,6 @@
 import {
   createMachineMiddleware as middleware,
-  TRANSITION_MACHINE,
+  TRANSITION_MACHINE_STATE,
   transitionTo
 } from '../source/'
 import configureStore from 'redux-mock-store'
@@ -8,7 +8,7 @@ import * as R from 'ramda'
 
 const createStore = configureStore([middleware])
 
-const initialMachines = {
+export const initialMachines = {
   foo: {
     default: 'STATE_2',
     selector: ['baz'],
@@ -83,7 +83,7 @@ test('should transition based on store state passed to cond', () => {
   const {actionHandler, doDispatch} = setUpForTest()
   actionHandler({type: 'BAZ_ACTION'})
   expect(doDispatch).toBeCalledWith({
-    type: TRANSITION_MACHINE,
+    type: TRANSITION_MACHINE_STATE,
     machineName: 'foo',
     stateName: 'STATE_1'
   })
@@ -98,7 +98,7 @@ test('should transition based on action payload passed to cond', () => {
   const {doDispatch, actionHandler} = setUpForTest(machines)
   actionHandler({type: 'BAZ_ACTION', baz: 11})
   expect(doDispatch).toBeCalledWith({
-    type: TRANSITION_MACHINE,
+    type: TRANSITION_MACHINE_STATE,
     machineName: 'foo',
     stateName: 'STATE_2'
   })
@@ -144,7 +144,7 @@ test('cond will use whole store state if storePath not provided', () => {
   })
   actionHandler({type: 'BAZ_ACTION'})
   expect(doDispatch).toBeCalledWith({
-    type: TRANSITION_MACHINE,
+    type: TRANSITION_MACHINE_STATE,
     machineName: 'foo',
     stateName: 'STATE_1'
   })

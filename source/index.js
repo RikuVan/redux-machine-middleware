@@ -1,15 +1,24 @@
-export const TRANSITION_MACHINE = '@@TRANSITION_MACHINE'
+export const TRANSITION_MACHINE_STATE = '@@machine/TRANSITION_STATE'
+export const INITIALIZE_MACHINE = '@@machine/INITIALIZE'
 
 /*~*~*~*~*~*~*~*~*~*~*~* ACTIONS *~*~*~*~*~*~*~*~*~*~*~*/
 export const transitionTo = (machineName, stateName) => ({
-  type: TRANSITION_MACHINE,
+  type: TRANSITION_MACHINE_STATE,
   machineName,
   stateName
 })
 
-/*~*~*~*~*~*~*~*~*~*~*~* REDUCER *~*~*~*~*~*~*~*~*~*~*~*/
+export const initializeMachine = (machineName, machine) => ({
+  type: INITIALIZE_MACHINE,
+  machineName,
+  machine
+})
+
+/*~*~*~*~*~*~*~*~*~*~*~* REDUCERS *~*~*~*~*~*~*~*~*~*~*~*/
+
+// centralize all machine states in one reducer
 export const machinesReducer = (state = {}, action) => {
-  if (action.type === TRANSITION_MACHINE) {
+  if (action.type === TRANSITION_MACHINE_STATE) {
     const updatedMachine = {
       ...state[action.machineName],
       current: action.stateName,
@@ -20,6 +29,56 @@ export const machinesReducer = (state = {}, action) => {
     return {...state, [action.machineName]: updatedMachine}
   }
   return state
+}
+
+const machineReducer = (state, action) => {
+  if (
+    action.type === TRANSITION_MACHINE_STATE &&
+    state.$$machine.name &&
+    action.machineName === state.$$machine.name
+  ) {
+    return {
+      ...state,
+      $$machine: {...state.$$machine, current: action.stateName}
+    }
+  }
+  if (action.type === INITIALIZE_MACHINE) {
+    const {machine, machineName: name} = action
+    return {
+      ...state,
+      $$machine: {
+        current: machine.default,
+        name,
+        machine
+      }
+    }
+  }
+  return state
+}
+
+// alternative: decorate a reducer with a machine
+export const decorateReducerWithMachine = (name, machine) => (
+  decoratedReducer,
+  initialState
+) => {
+  const initialMachineState = {
+    $$machine: {
+      current: machine.default,
+      name,
+      machine
+    }
+  }
+  const initialMergedState = {...initialState, ...initialMachineState}
+  return (prevState, action) => {
+    const prevStateIsUndefined = typeof prevState === 'undefined'
+    const valueIsUndefined = typeof action === 'undefined'
+    if (prevStateIsUndefined && valueIsUndefined) {
+      return initialMergedState
+    }
+    return [machineReducer, decoratedReducer].reduce((newState, reducer) => {
+      return reducer(newState, action)
+    }, prevStateIsUndefined && !valueIsUndefined ? initialMergedState : prevState)
+  }
 }
 
 /*~*~*~*~*~*~*~*~*~*~*~* CREATE MIDDLEWARE *~*~*~*~*~*~*~*~*~*~*~*/
@@ -33,7 +92,7 @@ export function createMachineMiddleware(machines = {}, options = {}) {
       )
     }
     let nextAction
-    if (has('type', action) && action.type === TRANSITION_MACHINE) {
+    if (has('type', action) && action.type === TRANSITION_MACHINE_STATE) {
       validate &&
         validateTransitionAction(
           machines,

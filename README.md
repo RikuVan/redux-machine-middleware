@@ -70,7 +70,7 @@ Transitions can either occur automatically via an autoTransition or by using the
 ### Machine reducer
 
 - must be named `machines`
-- only updates on one action type: TRANSITION_MACHINE
+- only updates on one action type: TRANSITION_MACHINE_STATE
 - listen for this same action in other reducers if you like
 
 ### Validation
