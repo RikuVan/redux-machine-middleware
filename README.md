@@ -10,14 +10,16 @@
 - [ ] > 90% test coverage
 - [ ] add additional complex example
 - [x] build (rollup?)
-- [ ] option to use your own reducer
-- [ ] possibility to initialize more machines via action
+- [x] option to use your own reducer
+- [x] possibility to initialize more machines via action
 
 ### Quick start
 
 ```js
 npm install redux-machine-middleware
 ```
+
+#### Option 1
 
 ```js
 import {
@@ -47,6 +49,42 @@ const rootReducer = combineReducers({
 store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 ```
 
+#### Option 2
+
+```js
+import {
+  createMachineMiddleware,
+  decorateReducerWithMachine,
+  transitionTo
+} from 'redux-machine-middleware'
+
+const counterMachine = {/* see example below */}
+
+const machineMiddleware = createMachineMiddleware(
+  {},
+  { strict: true }
+)
+
+applyMiddleware(/* other middleware */ machineMiddleware)
+
+const machineDecorator = decorateReducerWithMachine('counter', counterMachine)
+const counterReducer = (state, action) => {
+  if (action.type === INC) {
+    return {...state, state.number + 1}
+  }
+  return state
+}
+
+const rootReducer = combineReducers({
+  // give your reducer and initialState to the decorator
+  counter: machineDecorator(counterReducer, {number: 0}),
+  gallery: galleryReducer
+})
+
+// initialize your reducer with your initial state
+store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
+```
+
 ### Why
 
 There are much better explanations of finite state machines out there than what I can provide and a state machine is probably overkill for small functionality. But here is why I am interested. As features grow, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. But we still lack the ability to hook into the transitions from state to state--the variants grow out of control. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of forcing your to document states.
@@ -69,9 +107,15 @@ Transitions can either occur automatically via an autoTransition or by using the
 
 ### Machine reducer
 
+#### OPTION A - single `machineReducer`
+
 - must be named `machines`
 - only updates on one action type: TRANSITION_MACHINE_STATE
 - listen for this same action in other reducers if you like
+
+#### OPTION B - decorate your reducers with machine using `decorateReducerWithMachine``
+
+- the state of your reducer will be merged with the state of the named machine
 
 ### Validation
 
@@ -83,7 +127,7 @@ In strict mode, errors will be thrown for:
 - invalid transition object value types
 - cond function which does not return a truthy or falsey value
 
-#### State machine config
+### State machine config
 
 ```js
 const machines = {

@@ -1,7 +1,8 @@
 import {
   createMachineMiddleware as middleware,
   TRANSITION_MACHINE_STATE,
-  transitionTo
+  transitionTo,
+  MACHINE_STATE
 } from '../source/'
 import configureStore from 'redux-mock-store'
 import * as R from 'ramda'
@@ -223,4 +224,53 @@ test('transition object may contain special property prefixed with _ or $ in str
   expect(() =>
     actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
   ).not.toThrow()
+})
+
+describe('middleware with machines from reducers', () => {
+  const machine = R.set(
+    R.lensPath(['selector']),
+    ['foo', 'baz'],
+    initialMachines.foo
+  )
+
+  test('should transition based on store state passed to cond', () => {
+    const initialState = {
+      foo: {
+        [MACHINE_STATE]: {
+          name: 'foo',
+          current: 'STATE_2',
+          machine
+        },
+        baz: 11
+      }
+    }
+    const {actionHandler, doDispatch} = setUpForTest({}, initialState)
+    actionHandler({type: 'BAZ_ACTION'})
+    expect(doDispatch).toBeCalledWith({
+      type: TRANSITION_MACHINE_STATE,
+      machineName: 'foo',
+      stateName: 'STATE_1'
+    })
+  })
+
+  test('should transition based on action payload passed to cond', () => {
+    const m = R.set(R.lensPath(['default']), 'STATE_0', machine)
+    const initialState = {
+      foo: {
+        [MACHINE_STATE]: {
+          name: 'foo',
+          current: 'STATE_0',
+          machine: m
+        },
+        baz: 11
+      }
+    }
+    const {actionHandler, doDispatch} = setUpForTest({}, initialState)
+    actionHandler({type: 'BAZ_ACTION', baz: 11})
+    expect(doDispatch).toBeCalledWith({
+      type: TRANSITION_MACHINE_STATE,
+      machineName: 'foo',
+      stateName: 'STATE_2'
+    })
+  })
 })

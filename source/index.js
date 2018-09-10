@@ -1,5 +1,7 @@
 export const TRANSITION_MACHINE_STATE = '@@machine/TRANSITION_STATE'
 export const INITIALIZE_MACHINE = '@@machine/INITIALIZE'
+export const MACHINE_STATE =
+  typeof Symbol !== 'undefined' ? Symbol('machine') : '__$machine'
 
 /*~*~*~*~*~*~*~*~*~*~*~* ACTIONS *~*~*~*~*~*~*~*~*~*~*~*/
 export const transitionTo = (machineName, stateName) => ({
@@ -34,19 +36,19 @@ export const machinesReducer = (state = {}, action) => {
 const machineReducer = (state, action) => {
   if (
     action.type === TRANSITION_MACHINE_STATE &&
-    state.$$machine.name &&
-    action.machineName === state.$$machine.name
+    state[MACHINE_STATE].name &&
+    action.machineName === state[MACHINE_STATE].name
   ) {
     return {
       ...state,
-      $$machine: {...state.$$machine, current: action.stateName}
+      [MACHINE_STATE]: {...state[MACHINE_STATE], current: action.stateName}
     }
   }
   if (action.type === INITIALIZE_MACHINE) {
     const {machine, machineName: name} = action
     return {
       ...state,
-      $$machine: {
+      [MACHINE_STATE]: {
         current: machine.default,
         name,
         machine
@@ -62,7 +64,7 @@ export const decorateReducerWithMachine = (name, machine) => (
   initialState
 ) => {
   const initialMachineState = {
-    $$machine: {
+    [MACHINE_STATE]: {
       current: machine.default,
       name,
       machine
@@ -82,24 +84,20 @@ export const decorateReducerWithMachine = (name, machine) => (
 }
 
 /*~*~*~*~*~*~*~*~*~*~*~* CREATE MIDDLEWARE *~*~*~*~*~*~*~*~*~*~*~*/
-export function createMachineMiddleware(machines = {}, options = {}) {
+export function createMachineMiddleware(initialMachines = {}, options = {}) {
   return ({dispatch, getState}) => next => action => {
     const validate = !!options.strict
     const currentStoreState = getState()
-    if (!currentStoreState.machines && validate) {
+    const machines = mergeMachines(initialMachines, currentStoreState)
+    // is empty of nil
+    if (isEmptyObj(machines) && validate) {
       throw new Error(
-        'missing initial machine state: add the machineReducer to combineReducer'
+        'missing initial machine state: add the machineReducer to combineReducer or use the decorator to add machines to your reducers'
       )
     }
     let nextAction
     if (has('type', action) && action.type === TRANSITION_MACHINE_STATE) {
-      validate &&
-        validateTransitionAction(
-          machines,
-          machines[action.machineName],
-          action,
-          currentStoreState.machines[action.machineName]
-        )
+      validate && validateTransitionAction(machines, action, currentStoreState)
       for (const currentMachine of Object.values(machines)) {
         const nextState = findState(currentMachine, action.stateName)
         if (has('before', nextState)) {
@@ -112,9 +110,11 @@ export function createMachineMiddleware(machines = {}, options = {}) {
       }
     } else {
       for (const [machineName, currentMachine] of Object.entries(machines)) {
+        const currentInStore = getCurrentInStore(machineName, currentStoreState)
+
         const currentState = findStateWithDefault(
           currentMachine,
-          currentStoreState.machines[machineName]
+          currentInStore
         )
         if (
           Array.isArray(currentState.autoTransitions) &&
@@ -177,6 +177,28 @@ export function createMachineMiddleware(machines = {}, options = {}) {
 }
 
 /*~*~*~*~*~*~*~*~*~*~*~* HELPERS *~*~*~*~*~*~*~*~*~*~*~*/
+function mergeMachines(machines, state = {}) {
+  return Object.values(state).reduce((acc, stateSlice) => {
+    if (stateSlice[MACHINE_STATE] && stateSlice[MACHINE_STATE].name) {
+      acc[stateSlice[MACHINE_STATE].name] = stateSlice[MACHINE_STATE].machine
+    }
+    return acc
+  }, machines || {})
+}
+
+function getCurrentInStore(machineName, currentStoreState) {
+  if (currentStoreState.machines && currentStoreState.machines[machineName]) {
+    return currentStoreState.machines[machineName]
+  }
+  const machine = Object.values(currentStoreState).find(
+    slice => slice[MACHINE_STATE] && slice[MACHINE_STATE].name === machineName
+  )
+  if (machine) {
+    return machine[MACHINE_STATE].current
+  }
+  return undefined
+}
+
 function getStoreStateForCond(currentMachine, storeState) {
   if (Array.isArray(currentMachine.selector)) {
     return currentMachine.selector.reduce(function(obj, prop) {
@@ -186,22 +208,15 @@ function getStoreStateForCond(currentMachine, storeState) {
   return storeState
 }
 
-function validateTransitionAction(
-  machines,
-  machine,
-  action,
-  currentMachineState
-) {
+function validateTransitionAction(machines, action, storeState) {
+  const machine = machines[action.machineName]
   if (!machine) {
     throwMissingMachineError(machines, action.machineName)
   }
   // we are checking the state before the one in the action
   // to see if the new one is valid
-  const currentState = findStateWithDefault(
-    machine,
-    action.stateName,
-    currentMachineState
-  )
+  const currentName = getCurrentInStore(storeState, action.stateName)
+  const currentState = findStateWithDefault(machine, currentName)
   if (currentState && currentState.validTransitions) {
     if (
       !currentState.validTransitions
@@ -257,10 +272,13 @@ function findState(machine, stateName) {
   return machine.states.find(state => state.name === stateName)
 }
 
+// FIXME: different shapes for data from decorated vs central reducer
 function findStateWithDefault(machine, machineState) {
   const current =
-    machineState && machineState.current
+    machineState && has('current', machineState)
       ? machineState.current
+        ? is(machineState, String)
+        : machineState
       : machine.default
   return findState(machine, current)
 }
@@ -305,4 +323,8 @@ function has(prop, obj) {
 
 function is(val, Type) {
   return Object.prototype.toString.call(val) === `[object ${Type}]`
+}
+
+function isEmptyObj(val) {
+  return Object.keys(val).length === 0
 }

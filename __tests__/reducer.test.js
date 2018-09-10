@@ -2,7 +2,8 @@ import {
   machinesReducer,
   TRANSITION_MACHINE_STATE,
   decorateReducerWithMachine,
-  INITIALIZE_MACHINE
+  INITIALIZE_MACHINE,
+  MACHINE_STATE
 } from '../source'
 
 test('machinesReducer will return state', () => {
@@ -51,7 +52,11 @@ test('decorateReducerWithMachine should return a function', () => {
 test('decorated reducer should return passed reducer state merged with machine state', () => {
   expect(reducer(undefined, {type: 'ANY'})).toEqual({
     value: 0,
-    $$machine: {name: 'foo', current: 'STATE_0', machine: {default: 'STATE_0'}}
+    [MACHINE_STATE]: {
+      name: 'foo',
+      current: 'STATE_0',
+      machine: {default: 'STATE_0'}
+    }
   })
 })
 
@@ -60,7 +65,7 @@ test('decorated reducer should update on relevant actions', () => {
     reducer(
       {
         value: 0,
-        $$machine: {
+        [MACHINE_STATE]: {
           name: 'foo',
           current: 'STATE_0',
           machine: {default: 'STATE_0'}
@@ -70,7 +75,7 @@ test('decorated reducer should update on relevant actions', () => {
     )
   ).toEqual({
     value: 1,
-    $$machine: {
+    [MACHINE_STATE]: {
       name: 'foo',
       current: 'STATE_0',
       machine: {default: 'STATE_0'}
@@ -83,7 +88,7 @@ test('decorated reducer should update on TRANSITION_MACHINE_STATE', () => {
     reducer(
       {
         value: 0,
-        $$machine: {
+        [MACHINE_STATE]: {
           name: 'foo',
           current: 'STATE_0',
           machine: {default: 'STATE_0'}
@@ -93,7 +98,7 @@ test('decorated reducer should update on TRANSITION_MACHINE_STATE', () => {
     )
   ).toEqual({
     value: 0,
-    $$machine: {
+    [MACHINE_STATE]: {
       name: 'foo',
       current: 'STATE_1',
       machine: {default: 'STATE_0'}
@@ -109,7 +114,7 @@ test('decorated reducer should update on INITIALIZE_MACHINE', () => {
     r(
       {
         value: 0,
-        $$machine: {
+        [MACHINE_STATE]: {
           name: 'foo',
           current: undefined,
           machine: {}
@@ -123,7 +128,7 @@ test('decorated reducer should update on INITIALIZE_MACHINE', () => {
     )
   ).toEqual({
     value: 0,
-    $$machine: {
+    [MACHINE_STATE]: {
       name: 'foo',
       current: 'STATE_3',
       machine: {default: 'STATE_3'}
