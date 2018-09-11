@@ -4181,9 +4181,9 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-machine-middleware@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.2.1.tgz#955bc43273ffa07c44bf53fb03d231b1b7a3af0f"
+redux-machine-middleware@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.3.0.tgz#3a65a70708705f13bb428037df51b0a925fe488c"
 
 redux-saga@^0.16.0:
   version "0.16.0"

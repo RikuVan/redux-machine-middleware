@@ -22,7 +22,7 @@
     "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
-    "redux-machine-middleware": "^0.2.1",
+    "redux-machine-middleware": "^0.3.0",
     "redux-saga": "^0.16.0",
     "schedule": "^0.3.0"
   },
