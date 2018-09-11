@@ -8,7 +8,7 @@
 
 - [x] eslint
 - [ ] > 90% test coverage
-- [ ] add additional complex example
+- [ ] additional, more complex example
 - [x] build (rollup?)
 - [x] option to use your own reducer
 - [x] possibility to initialize more machines via action
@@ -19,7 +19,7 @@
 npm install redux-machine-middleware
 ```
 
-#### Option 1
+#### Option A
 
 ```js
 import {
@@ -42,14 +42,14 @@ applyMiddleware(/* other middleware */ machineMiddleware)
 const rootReducer = combineReducers({
   // this must be named machines
   machines: machinesReducer,
-  gallery: galleryReducer
+  counter: counterReducer
 })
 
 // initialize your reducer with your initial state
 store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 ```
 
-#### Option 2
+#### Option B
 
 ```js
 import {
@@ -58,19 +58,18 @@ import {
   transitionTo
 } from 'redux-machine-middleware'
 
-const counterMachine = {/* see example below */}
+const counterMachine = {
+  /* see example below */
+}
 
-const machineMiddleware = createMachineMiddleware(
-  {},
-  { strict: true }
-)
+const machineMiddleware = createMachineMiddleware({}, {strict: true})
 
 applyMiddleware(/* other middleware */ machineMiddleware)
 
 const machineDecorator = decorateReducerWithMachine('counter', counterMachine)
 const counterReducer = (state, action) => {
   if (action.type === INC) {
-    return {...state, state.number + 1}
+    return {...state, number: state.number + 1}
   }
   return state
 }
@@ -78,7 +77,7 @@ const counterReducer = (state, action) => {
 const rootReducer = combineReducers({
   // give your reducer and initialState to the decorator
   counter: machineDecorator(counterReducer, {number: 0}),
-  gallery: galleryReducer
+  ...otherReducers
 })
 
 // initialize your reducer with your initial state
@@ -87,7 +86,7 @@ store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 
 ### Why
 
-There are much better explanations of finite state machines out there than what I can provide and a state machine is probably overkill for small functionality. But here is why I am interested. As features grow, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. But we still lack the ability to hook into the transitions from state to state--the variants grow out of control. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of forcing your to document states.
+There are much better explanations of finite state machines out there than what I can provide. My experience that as features grow incomolexity, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. Nevertheless, the ability to hook into the transitions,add conditions, validation and enforce patterns are limited by union types in js. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of rich document of states.
 
 ### Examples
 
@@ -109,13 +108,20 @@ Transitions can either occur automatically via an autoTransition or by using the
 
 #### OPTION A - single `machineReducer`
 
+`machineReducer :: (state: {}, action: {type: string}) -> state`
+
 - must be named `machines`
 - only updates on one action type: TRANSITION_MACHINE_STATE
 - listen for this same action in other reducers if you like
 
-#### OPTION B - decorate your reducers with machine using `decorateReducerWithMachine``
+#### OPTION B - decorate your reducers with machine using
+
+`decorateReducerWithMachine :: (machineName: string, machine: Machine) -> (reducer: function, initialState: {}) -> (state: {}, action: {type: string}) -> state`
 
 - the state of your reducer will be merged with the state of the named machine
+- machine identifier is a symbol to avoid conflicting with your properties
+
+In theory you could mix options A & B, although this is not yet tested and would probably lead to confusing code.
 
 ### Validation
 
@@ -164,6 +170,8 @@ const machines = {
           }
         ],
         // if 'IDLE' is the next state called with transtionTo, 'before' or 'after' hooks will be called
+        // It is IMPORTANT to notice that this is different logic that for autoTransitions
+        // the hooks there happen round the departing state and here around the arriving state
         after: ({getState, dispatch, action}) => announceShutdown(action)
       },
       validTransitions: ['RUNNING']
@@ -171,3 +179,21 @@ const machines = {
   }
 }
 ```
+
+### Selectors
+
+#### Option A
+
+`getMachineState :: (name: string) -> (state: StoreState) -> string`
+
+Use this one if you use the single default reducer with the name `machines`.
+
+The first string parameter is the name give to the machine.
+
+#### Option B
+
+`getMachineStateFromDecorated :: (name: string) -> (state: StoreState) -> string`
+
+Use this one if you use the decorate your own reducer with `decorateReducerWithMachine`.
+
+The first string parameter is the name given to the reducer.

@@ -4181,9 +4181,9 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-machine-middleware@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.1.3.tgz#ea651f50e2b1bdca4ddbdf0bbee3a0e2dc400be1"
+redux-machine-middleware@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/redux-machine-middleware/-/redux-machine-middleware-0.2.1.tgz#955bc43273ffa07c44bf53fb03d231b1b7a3af0f"
 
 redux-saga@^0.16.0:
   version "0.16.0"
@@ -4387,6 +4387,12 @@ sass-graph@^2.2.4:
 sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+
+schedule@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/schedule/-/schedule-0.3.0.tgz#1be2ab2fc2e768536269ce7326efb478d6c045e8"
+  dependencies:
+    object-assign "^4.1.1"
 
 scss-tokenizer@^0.2.3:
   version "0.2.3"

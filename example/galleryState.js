@@ -21,6 +21,7 @@ export const updateGallery = (items, error) => ({
   error
 })
 export const openPhoto = item => ({type: OPEN_PHOTO, item})
+import {decorateReducerWithMachine} from 'redux-machine-middleware'
 
 export const states = {
   NOT_ASKED: 'not-asked',
@@ -101,7 +102,7 @@ export function* gallerySaga() {
   yield all([takeLatest('SEARCH', fetchImages)])
 }
 
-export const galleryReducer = (state = {items: [], query: ''}, action) => {
+const reducer = (state, action) => {
   switch (action.type) {
     case UPDATE_QUERY: {
       return {...state, query: action.query}
@@ -115,3 +116,11 @@ export const galleryReducer = (state = {items: [], query: ''}, action) => {
   }
   return state
 }
+
+export const galleryReducer = decorateReducerWithMachine(
+  'gallery',
+  galleryMachine
+)(reducer, {
+  items: [],
+  query: ''
+})

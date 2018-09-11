@@ -1,7 +1,19 @@
 export const TRANSITION_MACHINE_STATE = '@@machine/TRANSITION_STATE'
 export const INITIALIZE_MACHINE = '@@machine/INITIALIZE'
-export const MACHINE_STATE =
-  typeof Symbol !== 'undefined' ? Symbol('machine') : '__$machine'
+export const MACHINE_STATE = '__$machine'
+
+/*~*~*~*~*~*~*~*~*~*~*~* SELECTORS *~*~*~*~*~*~*~*~*~*~*~*/
+export const getMachineState = name => state =>
+  state.machines && state.machines[name] && state.machines[name].current
+    ? state.machines[name].current
+    : null
+
+export const getMachineStateFromDecorated = name => state =>
+  state[name] &&
+  state[name][MACHINE_STATE] &&
+  state[name][MACHINE_STATE].current
+    ? state[name][MACHINE_STATE].current
+    : null
 
 /*~*~*~*~*~*~*~*~*~*~*~* ACTIONS *~*~*~*~*~*~*~*~*~*~*~*/
 export const transitionTo = (machineName, stateName) => ({
@@ -111,7 +123,6 @@ export function createMachineMiddleware(initialMachines = {}, options = {}) {
     } else {
       for (const [machineName, currentMachine] of Object.entries(machines)) {
         const currentInStore = getCurrentInStore(machineName, currentStoreState)
-
         const currentState = findStateWithDefault(
           currentMachine,
           currentInStore
@@ -272,14 +283,17 @@ function findState(machine, stateName) {
   return machine.states.find(state => state.name === stateName)
 }
 
-// FIXME: different shapes for data from decorated vs central reducer
 function findStateWithDefault(machine, machineState) {
-  const current =
-    machineState && has('current', machineState)
-      ? machineState.current
-        ? is(machineState, String)
-        : machineState
-      : machine.default
+  const current = (() => {
+    if (machineState && has('current', machineState)) {
+      return machineState.current
+    }
+    // this happens if selector is used on state--maybe get rid of selector option?
+    if (is(machineState, 'String')) {
+      return machineState
+    }
+    return machine.default
+  })()
   return findState(machine, current)
 }
 

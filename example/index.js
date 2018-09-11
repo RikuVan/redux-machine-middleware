@@ -3,6 +3,10 @@ import {connect} from 'react-redux'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {
+  transitionTo,
+  getMachineStateFromDecorated
+} from 'redux-machine-middleware'
+import {
   updateQuery,
   submitSearch,
   states,
@@ -12,7 +16,6 @@ import {
 import './index.scss'
 import {store} from './store'
 import Gallery from './Gallery'
-import {transitionTo} from 'redux-machine-middleware'
 
 /*
   This example was adopting from an xstate example by David Khourshid: https://codepen.io/davidkpiano/pen/dJJMWE
@@ -76,10 +79,10 @@ class App extends React.Component {
 }
 
 const ConnectedApp = connect(
-  ({gallery, machines}) => ({
-    query: gallery.query,
-    currentState: machines.gallery.current,
-    photo: gallery.photo
+  state => ({
+    query: state.gallery.query,
+    currentState: getMachineStateFromDecorated('gallery')(state),
+    photo: state.gallery.photo
   }),
   {updateQuery, submitSearch, transitionGallery, openPhoto, closePhoto}
 )(App)

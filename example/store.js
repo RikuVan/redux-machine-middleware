@@ -3,23 +3,15 @@ import createSagaMiddleware from 'redux-saga'
 import {all, fork} from 'redux-saga/effects'
 
 import {gallerySaga, galleryReducer, galleryMachine} from './galleryState'
-import {
-  createMachineMiddleware,
-  machinesReducer,
-  transitionTo
-} from 'redux-machine-middleware'
+import {createMachineMiddleware, transitionTo} from 'redux-machine-middleware'
 
-const machineMiddleware = createMachineMiddleware(
-  {gallery: galleryMachine},
-  {strict: true}
-)
+const machineMiddleware = createMachineMiddleware({}, {strict: true})
 
 function* rootSaga() {
   yield all([fork(gallerySaga)])
 }
 
 const rootReducer = combineReducers({
-  machines: machinesReducer,
   gallery: galleryReducer
 })
 
