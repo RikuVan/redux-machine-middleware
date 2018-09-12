@@ -86,7 +86,7 @@ store.dispatch(transitionTo('counter', 'INITITAL_STATE'))
 
 ### Why
 
-There are much better explanations of finite state machines out there than what I can provide. My experience that as features grow incomolexity, if you only think of your UI in terms of boolean flags and conditionals, you will quickly be fighting bugs. Using Redux alone doesn't prevent this. Moduling your UI as a union type may help. Nevertheless, the ability to hook into the transitions,add conditions, validation and enforce patterns are limited by union types in js. Modeling your UI as a finite state machine seems a promising way to bring discipline to your code base when there are many variants--each state and transition is accounted for by the machine. This has the added benefit of rich document of states.
+Read here to learn a bit about [finite state machines](https://www.smashingmagazine.com/2018/01/rise-state-machines/). As your features grow in complexity, if you only think of your UI in terms of boolean flags and conditionals to order to transition from state to state, the complexity in your views will escalate. Using Redux alone doesn't prevent this. The idea here is to let your store do what its does best--hold your data and update when actions are dispatched, while your machine middleware controls your state transitions, ideally eliminating the need to fill your view with logic that does not really document your intention.
 
 ### Examples
 
