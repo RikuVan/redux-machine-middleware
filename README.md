@@ -2,17 +2,6 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/RikuVan/redux-machine-middleware/badge.svg?branch=master)](https://coveralls.io/github/RikuVan/redux-machine-middleware?branch=master)
 
-### Beware, this is new and untested in the wild.
-
-## TODO
-
-- [x] eslint
-- [ ] > 90% test coverage
-- [ ] additional, more complex example
-- [x] build (rollup?)
-- [x] option to use your own reducer
-- [x] possibility to initialize more machines via action
-
 ### Quick start
 
 ```js

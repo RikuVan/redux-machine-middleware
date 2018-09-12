@@ -201,9 +201,47 @@ test('throws an error if transition contains an invalid property in strict mode'
     baz: -1,
     machines: {foo: {}}
   })
-  expect(() => actionHandler({type: 'BAZ_ACTION', payload: 'hey'})).toThrow(
+  expect(() =>
+    actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
+  ).toThrowError(
     `condition is not a valid property for autoTransition configuration`
   )
+})
+
+test('throws an error if "to" property is not a string in strict mode', () => {
+  const m = R.set(
+    R.lensPath(['foo', 'states', 2, 'autoTransitions', 0]),
+    {
+      cond: baz => baz > 2 && baz < 4,
+      to: true
+    },
+    initialMachines
+  )
+  const {actionHandler} = setUpForTest(m, {
+    baz: -1,
+    machines: {foo: {}}
+  })
+  expect(() =>
+    actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
+  ).toThrowError(/'true' is not of the correct type, it should be a string/)
+})
+
+test('throws an error if "cond" property is not a function in strict mode', () => {
+  const m = R.set(
+    R.lensPath(['foo', 'states', 2, 'autoTransitions', 0]),
+    {
+      cond: true,
+      to: 'STATE_1'
+    },
+    initialMachines
+  )
+  const {actionHandler} = setUpForTest(m, {
+    baz: -1,
+    machines: {foo: {}}
+  })
+  expect(() =>
+    actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
+  ).toThrowError(/'true' is not of the correct type, it should be a function/)
 })
 
 test('transition object may contain special property prefixed with _ or $ in strict mode', () => {
@@ -223,7 +261,7 @@ test('transition object may contain special property prefixed with _ or $ in str
   })
   expect(() =>
     actionHandler({type: 'BAZ_ACTION', payload: 'hey'})
-  ).not.toThrow()
+  ).not.toThrowError()
 })
 
 describe('middleware with machines from reducers', () => {
@@ -272,5 +310,23 @@ describe('middleware with machines from reducers', () => {
       machineName: 'foo',
       stateName: 'STATE_2'
     })
+  })
+
+  test('should throw error if current state in store does not exist in strict mode', () => {
+    const m = R.set(R.lensPath(['default']), 'STATE_0', machine)
+    const initialState = {
+      foo: {
+        [MACHINE_STATE]: {
+          name: 'foo',
+          current: 'STATE_4',
+          machine: m
+        },
+        baz: 11
+      }
+    }
+    const {actionHandler, doDispatch} = setUpForTest({}, initialState)
+    expect(() => actionHandler({type: 'BAZ_ACTION', baz: 11})).toThrowError(
+      /Invalid transition to 'STATE_4'. Valid states are: STATE_0, STATE_1, STATE_2./
+    )
   })
 })

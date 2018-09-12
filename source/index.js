@@ -125,7 +125,8 @@ export function createMachineMiddleware(initialMachines = {}, options = {}) {
         const currentInStore = getCurrentInStore(machineName, currentStoreState)
         const currentState = findStateWithDefault(
           currentMachine,
-          currentInStore
+          currentInStore,
+          validate
         )
         if (
           Array.isArray(currentState.autoTransitions) &&
@@ -154,7 +155,7 @@ export function createMachineMiddleware(initialMachines = {}, options = {}) {
             }
             if (shouldTransition) {
               const nextState = getNextStateName(
-                currentMachine.states,
+                currentMachine,
                 currentState.name,
                 transition.to
               )
@@ -227,7 +228,7 @@ function validateTransitionAction(machines, action, storeState) {
   // we are checking the state before the one in the action
   // to see if the new one is valid
   const currentName = getCurrentInStore(storeState, action.stateName)
-  const currentState = findStateWithDefault(machine, currentName)
+  const currentState = findStateWithDefault(machine, currentName, true)
   if (currentState && currentState.validTransitions) {
     if (
       !currentState.validTransitions
@@ -279,11 +280,18 @@ function throwTypeError(val, type) {
   )
 }
 
-function findState(machine, stateName) {
-  return machine.states.find(state => state.name === stateName)
+function findState(machine, stateName, validate) {
+  const nextState = machine.states.find(state => state.name === stateName)
+  if (!nextState && validate) {
+    const validStates = machine.states.map(state => state.name).join(', ')
+    throw new Error(
+      `Invalid transition to '${stateName}'. Valid states are: ${validStates}.`
+    )
+  }
+  return nextState
 }
 
-function findStateWithDefault(machine, machineState) {
+function findStateWithDefault(machine, machineState, validate) {
   const current = (() => {
     if (machineState && has('current', machineState)) {
       return machineState.current
@@ -294,7 +302,7 @@ function findStateWithDefault(machine, machineState) {
     }
     return machine.default
   })()
-  return findState(machine, current)
+  return findState(machine, current, validate)
 }
 
 function throwInvalidTransitionError(currentStateName, newStateName) {
